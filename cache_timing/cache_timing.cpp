@@ -22,7 +22,7 @@ void allocate_arr(testing_type* arr, unsigned long size)
 {
     for(unsigned long i = 0; i < size; i++)
     {
-        arr[i] = 2;
+        arr[i] = 2; //allocating to something random
     }
 }
 
@@ -46,9 +46,9 @@ int main()
     int arr_size_start = 4 * to_kb(sizeof(testing_type));
     int stride_start = 1;
     
-    int stride_doublings = 16;
-    int array_doublings = 10;
-    int sims = 20000;
+    int stride_doublings = 22;
+    int array_doublings = 16;
+    int sims = 500;
 
     f.open("out.csv");
 
@@ -63,20 +63,21 @@ int main()
 
     // write legend values
     arr_size = arr_size_start;
-    for(int j = 0; j < stride_doublings; j++)
+    for(int j = 0; j < array_doublings; j++)
     {
         f << std::fixed << arr_size*sizeof(testing_type) << ",";
         arr_size *= 2;
     }
     f << "-\n";
 
-    arr_size = arr_size_start;
+    //mallocs and allocates the maximum size of the array
+    testing_type* arr = (testing_type*) malloc(arr_size * sizeof(testing_type));
+    allocate_arr(arr, arr_size);
+
+    arr_size = arr_size_start; // resets array to initial size
     for(int i = 0; i < array_doublings; i++)
     {
-        stride = stride_start;
-        testing_type* arr = (testing_type*) malloc(arr_size * sizeof(testing_type));
-        allocate_arr(arr, arr_size);
-        
+        stride = stride_start; // resets stride to its initial size        
         for(int j = 0; j < stride_doublings && stride < arr_size; j++)
         {
             unsigned long k;
@@ -85,7 +86,7 @@ int main()
             {
                 for(k = 0; k < arr_size; k+=stride)
                 {
-                    // dummy_loader = arr[k];
+                    // dummy_loader = *(arr+k); // loads the value into a dummy variable
                     *(arr+k);
                 }
             }
@@ -98,11 +99,11 @@ int main()
             std::cout << "stride: " << stride << " counter: " << counter << std::endl;
         }
         f << "-\n";
-        free(arr);
         std::cout << "arr_size: " << arr_size << std::endl;
         arr_size *= 2;
     }
 
+    free(arr);
     f.close();
     return 0;
 }
