@@ -41,14 +41,14 @@ int main()
     unsigned long stride;
     unsigned long arr_size;
     // int dummy_loader;
-    int counter = 0;
+    unsigned long counter = 0;
 
     int arr_size_start = 4 * to_kb(sizeof(testing_type));
     int stride_start = 1;
     
     int stride_doublings = 22;
-    int array_doublings = 16;
-    int sims = 500;
+    int array_doublings = 14;
+    int sims = 2000;
 
     f.open("out.csv");
 
@@ -81,6 +81,7 @@ int main()
         for(int j = 0; j < stride_doublings && stride < arr_size; j++)
         {
             unsigned long k;
+            counter = 0;
             t1 = std::chrono::system_clock::now();
             for(int z = 0; z < sims; z++)
             {
@@ -88,12 +89,12 @@ int main()
                 {
                     // dummy_loader = *(arr+k); // loads the value into a dummy variable
                     *(arr+k);
+                    counter++;
                 }
             }
-
             t2 = std::chrono::system_clock::now();
             result = cast_nano(t2 - t1);
-            double temp = result.count() / (sims * ((double)arr_size / stride));
+            double temp = (double)result.count() / counter;
             f << std::fixed << temp << ",";
             stride *= 2;
             std::cout << "stride: " << stride << " counter: " << counter << std::endl;
